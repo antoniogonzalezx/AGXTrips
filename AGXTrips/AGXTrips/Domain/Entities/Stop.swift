@@ -14,6 +14,6 @@ struct Stop: Identifiable, Hashable, Sendable {
     let address: String
     let coordinate: Coordinate
     let stopTime: Date
-    let price: Decimal
+    let price: Double
     let isPaid: Bool
 }
