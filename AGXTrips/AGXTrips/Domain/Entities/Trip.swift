@@ -16,7 +16,6 @@ struct Trip: Identifiable, Hashable, Sendable {
     let origin: Location
     let destination: Location
     let stops: [StopPoint]
-    let route: [Coordinate]
     let startTime: Date
     let endTime: Date
     
