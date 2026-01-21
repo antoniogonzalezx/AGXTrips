@@ -7,11 +7,13 @@
 
 import SwiftUI
 import MapKit
+import SwiftData
 
 struct TripListView: View {
     @State var viewModel: TripListViewModel
     @State private var sheetDetent: PresentationDetent = .medium
     @State private var showReportForm = false
+    @Query private var reports: [Report]
     
     var body: some View {
         NavigationStack {
@@ -25,6 +27,7 @@ struct TripListView: View {
                             } label: {
                                 Image(systemName: "exclamationmark.bubble")
                             }
+                            .badge(reports.count)
                         }
                     }
                     .navigationDestination(isPresented: $showReportForm) {
