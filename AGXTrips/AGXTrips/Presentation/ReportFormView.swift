@@ -34,23 +34,21 @@ struct ReportFormView: View {
             }
             
             Section("Message") {
-                TextEditor(text: $viewModel.message)
-                    .frame(minHeight: 120)
+                TextField("Max. 200 characters", text: $viewModel.message, axis: .vertical)
+                    .lineLimit(5, reservesSpace: true)
             }
             
             Section {
                 Button {
                     viewModel.submit(context: modelContext)
                 } label: {
-                    HStack {
-                        Spacer()
-                        Text("Send report")
-                            .fontWeight(.semibold)
-                        Spacer()
-                    }
+                    Text("Send report")
+                        .fontWeight(.semibold)
+                        .frame(maxWidth: .infinity)
                 }
                 .disabled(!viewModel.isFormValid)
             }
+            .foregroundStyle(.blue)
         }
         .navigationTitle("Report issue")
         .alert("Report sent", isPresented: $viewModel.isSubmitted) {

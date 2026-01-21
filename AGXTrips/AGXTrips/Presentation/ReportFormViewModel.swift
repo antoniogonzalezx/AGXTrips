@@ -7,6 +7,7 @@
 
 import SwiftUI
 import SwiftData
+import UserNotifications
 
 @MainActor
 @Observable
@@ -23,7 +24,9 @@ final class ReportFormViewModel {
         !name.trimmingCharacters(in: .whitespaces).isEmpty &&
         !surname.trimmingCharacters(in: .whitespaces).isEmpty &&
         !email.trimmingCharacters(in: .whitespaces).isEmpty &&
-        !message.trimmingCharacters(in: .whitespaces).isEmpty
+        email.contains("@") &&
+        !message.trimmingCharacters(in: .whitespaces).isEmpty &&
+        message.count <= 200
     }
     
     func submit(context: ModelContext) {
@@ -41,6 +44,22 @@ final class ReportFormViewModel {
         
         context.insert(report)
         try? context.save()
+        updateAppBadge(context: context)
         isSubmitted = true
+    }
+    
+    // MARK: - Private
+    
+    private func updateAppBadge(context: ModelContext) {
+        let descriptor = FetchDescriptor<Report>()
+        let count = (try? context.fetchCount(descriptor)) ?? 0
+        
+        UNUserNotificationCenter.current().requestAuthorization(options: .badge) { granted, _ in
+            guard granted else { return }
+            
+            Task { @MainActor in
+                UNUserNotificationCenter.current().setBadgeCount(count)
+            }
+        }
     }
 }
