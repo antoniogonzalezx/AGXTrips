@@ -61,14 +61,10 @@ final class TripListViewModel {
         selectedStopTag = nil
     }
     
-    func clearStopSelection() {
-        selectedStop = nil
-        selectedStopTag = nil
-    }
-    
     func handleStopSelection(_ stopId: Int?) {
+        selectedStop = nil
+        
         guard let stopId else {
-            selectedStop = nil
             return
         }
         

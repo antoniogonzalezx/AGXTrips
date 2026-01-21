@@ -15,35 +15,43 @@ struct StopDetailView: View {
         NavigationStack {
             VStack(spacing: 20) {
                 VStack {
-                    Image(systemName: "mappin.circle.fill")
-                        .font(.system(size: 44))
-                        .foregroundColor(.red)
-                    Text(stop.address)
+                    Image(systemName: "figure.wave.circle.fill")
+                        .font(.system(size: 60))
+                        .foregroundStyle(.green)
+                    
+                    Text(stop.userName)
                         .font(.title.weight(.semibold))
                     
-                    Label(stop.userName.uppercased(), systemImage: "person.fill")
-                        .font(.title3.weight(.medium))
+                    Label(stop.address, systemImage: "location.fill")
+                        .font(.title3)
                         .foregroundStyle(.secondary)
                 }
                 .padding()
                 
-                Text(stop.isPaid ? "PAID" : "NOT PAID")
-                    .font(.default.weight(.medium))
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 4)
-                    .background(stop.isPaid ? .green.opacity(0.1) : .red.opacity(0.1))
-                    .foregroundStyle(stop.isPaid ? .green : .red)
-                    .clipShape(Capsule())
-                
                 HStack {
-                    detailLabel(stop.stopTime.formatted(date: .omitted, time: .shortened), systemImage: "clock")
+                    detailCard(
+                        title: "Time",
+                        value: stop.stopTime.formatted(date: .omitted, time: .shortened),
+                        icon: "clock.fill"
+                    )
                     
-                    detailLabel("\(stop.price.formatted())€", systemImage: "creditcard.fill")
+                    detailCard(
+                        title: "Price",
+                        value: "\(stop.price.formatted())€",
+                        icon: "eurosign.circle.fill"
+                    )
+                    
+                    detailCard(
+                        title: "Status",
+                        value: stop.isPaid ? "Paid" : "Pending",
+                        color: stop.isPaid ? .green : .red,
+                        icon: stop.isPaid ? "checkmark.square.fill" : "hourglass"
+                    )
                 }
-                
-                Spacer()
+                .padding(.horizontal)
             }
-            .navigationTitle("Stop")
+            .navigationTitle("Stop info")
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
                     Button {
@@ -56,20 +64,22 @@ struct StopDetailView: View {
         }
     }
     
-    private func detailLabel(_ title: String, systemImage: String) -> some View {
-        VStack {
-            Label(title, systemImage: systemImage)
-                .font(.title2.weight(.medium))
-                .padding()
-                .frame(maxWidth: .infinity, minHeight: 100)
+    private func detailCard(title: String, value: String, color: Color = .gray, icon: String) -> some View {
+        VStack(spacing: 8) {
+            Image(systemName: icon)
+                .foregroundStyle(.secondary)
+            
+            Text(title.uppercased())
+                .font(.caption)
+                .foregroundStyle(.secondary)
+            
+            Text(value)
+                .font(.title3.weight(.semibold))
         }
-        .background(.thinMaterial.opacity(0.5))
-        .clipShape(RoundedRectangle(cornerRadius: 16))
-        .overlay(
-            RoundedRectangle(cornerRadius: 16)
-                .stroke(lineWidth: 2)
-        )
-        
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 16)
+        .background(color.opacity(0.2))
+        .clipShape(RoundedRectangle(cornerRadius: 12))
     }
 }
 
