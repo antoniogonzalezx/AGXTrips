@@ -52,10 +52,16 @@ final class TripListViewModel {
         selectedTrip = trip
         selectedStop = nil
         selectedStopTag = nil
+        centerMap(on: trip)
     }
     
     func clearTripSelection() {
         selectedTrip = nil
+        selectedStop = nil
+        selectedStopTag = nil
+    }
+    
+    func clearStopSelection() {
         selectedStop = nil
         selectedStopTag = nil
     }
@@ -88,5 +94,34 @@ final class TripListViewModel {
         coordinates.append(trip.destination.coordinate.clLocationCoordinate2D)
         
         return coordinates
+    }
+    
+    // MARK: - Private
+
+    private func centerMap(on trip: Trip) {
+        let coordinates = routeCoordinates(for: trip)
+        
+        guard !coordinates.isEmpty else { return }
+        
+        let minLatitude = coordinates.map(\.latitude).min()!
+        let maxLatitude = coordinates.map(\.latitude).max()!
+        let minLongitude = coordinates.map(\.longitude).min()!
+        let maxLongitude = coordinates.map(\.longitude).max()!
+        
+        let center = CLLocationCoordinate2D(
+            latitude: (minLatitude + maxLatitude) / 2,
+            longitude: (minLongitude + maxLongitude) / 2
+        )
+        
+        let span = MKCoordinateSpan(
+            latitudeDelta: (maxLatitude - minLatitude) * 1.5,
+            longitudeDelta: (maxLongitude - minLongitude) * 1.5
+        )
+        
+        let region = MKCoordinateRegion(center: center, span: span)
+        
+        withAnimation(.easeInOut(duration: 0.5)) {
+            mapCameraPosition = .region(region)
+        }
     }
 }

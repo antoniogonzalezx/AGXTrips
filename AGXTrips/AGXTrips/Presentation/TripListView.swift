@@ -11,21 +11,33 @@ import MapKit
 struct TripListView: View {
     @State var viewModel: TripListViewModel
     @State private var sheetDetent: PresentationDetent = .medium
+    @State private var showContactForm = false
     
     var body: some View {
         NavigationStack {
             ZStack {
                 mapView
+                    .navigationTitle("AGXTrips")
+                    .navigationBarTitleDisplayMode(.inline)
+                    .toolbar {
+                        ToolbarItem(placement: .topBarTrailing) {
+                            Button {
+                                showContactForm = true
+                            } label: {
+                                Image(systemName: "exclamationmark.bubble")
+                            }
+                        }
+                    }
+                    .navigationDestination(isPresented: $showContactForm) {
+                        Text("Contact Form") // TODO: ContactFormView
+                    }
             }
         }
         .sheet(isPresented: .constant(true)) {
-            tripListSheet
-                .presentationDetents([.medium, .large], selection: $sheetDetent)
-                .presentationBackgroundInteraction(.enabled)
+            sheetContent
+                .presentationDetents(sheetDetents, selection: $sheetDetent)
+                .presentationBackgroundInteraction(.enabled(upThrough: .medium))
                 .interactiveDismissDisabled()
-        }
-        .sheet(item: $viewModel.selectedStop) { stop in
-            EmptyView()
         }
         .task {
             await viewModel.fetchTrips()
@@ -34,16 +46,16 @@ struct TripListView: View {
     }
     
     private var mapView: some View {
-        Map(position: $viewModel.mapCameraPosition) {
+        Map(position: $viewModel.mapCameraPosition, selection: $viewModel.selectedStopTag) {
             if let selectedTrip = viewModel.selectedTrip {
                 MapPolyline(coordinates: viewModel.routeCoordinates(for: selectedTrip))
-                    .stroke(.green, lineWidth: 4)
+                    .stroke(Gradient(colors: [.cyan, .blue, .purple]), lineWidth: 6)
                 
                 Marker(selectedTrip.origin.address, systemImage: "mappin.and.ellipse", coordinate: selectedTrip.origin.coordinate.clLocationCoordinate2D)
                     .tint(.blue)
                 
                 ForEach(viewModel.stops(for: selectedTrip)) { stop in
-                    Marker(stop.address, systemImage: "mappin.circle", coordinate: stop.coordinate.clLocationCoordinate2D)
+                    Marker(stop.address, systemImage: "mappin", coordinate: stop.coordinate.clLocationCoordinate2D)
                         .tint(.green)
                 }
                 
@@ -67,7 +79,7 @@ struct TripListView: View {
                         )
                         .onTapGesture {
                             viewModel.selectTrip(trip)
-                            sheetDetent = .medium
+                            sheetDetent = .fraction(0.25)
                         }
                     }
                 }
@@ -87,6 +99,26 @@ struct TripListView: View {
             } else {
                 tripList
             }
+        }
+    }
+    
+    @ViewBuilder
+    private var sheetContent: some View {
+        if let stop = viewModel.selectedStop {
+            StopDetailView(stop: stop) {
+                viewModel.selectedStop = nil
+                viewModel.selectedStopTag = nil
+            }
+        } else {
+            tripListSheet
+        }
+    }
+    
+    private var sheetDetents: Set<PresentationDetent> {
+        if viewModel.selectedStop != nil {
+            return [.medium]
+        } else {
+            return [.fraction(0.25), .medium, .large]
         }
     }
 }
