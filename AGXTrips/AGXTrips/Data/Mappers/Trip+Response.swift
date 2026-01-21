@@ -10,6 +10,7 @@ import Foundation
 extension Trip {
     init?(from response: TripResponse) {
         let dateFormatter = ISO8601DateFormatter()
+        dateFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
         
         guard
             let startTime = dateFormatter.date(from: response.startTime),

@@ -1,0 +1,95 @@
+//
+//  TripListViewModel.swift
+//  AGXTrips
+//
+//  Created by Antonio González Valdepeñas on 20/1/26.
+//
+
+import SwiftUI
+import MapKit
+
+@MainActor
+@Observable
+final class TripListViewModel {
+    private let tripRepository: TripRepository
+    private let stopRepository: StopRepository
+    
+    private(set) var trips: [Trip] = []
+    private(set) var stops: [Stop] = []
+    private(set) var isLoading: Bool = false
+    private(set) var error: Error?
+    
+    var selectedTrip: Trip?
+    var selectedStop: Stop?
+    var selectedStopTag: Int?
+    var mapCameraPosition: MapCameraPosition = .automatic
+    
+    init(tripRepository: TripRepository, stopRepository: StopRepository) {
+        self.tripRepository = tripRepository
+        self.stopRepository = stopRepository
+    }
+    
+    func fetchTrips() async {
+        isLoading = true
+        error = nil
+        
+        do {
+            async let fetchedTrips = self.tripRepository.fetchTrips()
+            async let fetchedStops = self.stopRepository.fetchStops()
+            
+            let (tripsData, stopsData) = try await (fetchedTrips, fetchedStops)
+            
+            print(tripsData)
+            print(stopsData)
+            
+            trips = tripsData
+            stops = stopsData
+        } catch {
+            self.error = error
+        }
+        
+        isLoading = false
+    }
+    
+    func selectTrip(_ trip: Trip) {
+        selectedTrip = trip
+        selectedStop = nil
+        selectedStopTag = nil
+    }
+    
+    func clearTripSelection() {
+        selectedTrip = nil
+        selectedStop = nil
+        selectedStopTag = nil
+    }
+    
+    func handleStopSelection(_ stopId: Int?) {
+        guard let stopId else {
+            selectedStop = nil
+            return
+        }
+        
+        if let stop = stops.first(where: { $0.id == stopId }) {
+            selectedStop = stop
+        }
+    }
+    
+    func stops(for trip: Trip) -> [Stop] {
+        let tripStopIds = Set(trip.stops.map(\.id))
+        return stops.filter { tripStopIds.contains($0.id) }
+    }
+    
+    func routeCoordinates(for trip: Trip) -> [CLLocationCoordinate2D] {
+        var coordinates: [CLLocationCoordinate2D] = []
+        
+        coordinates.append(trip.origin.coordinate.clLocationCoordinate2D)
+        
+        for stop in trip.stops {
+            coordinates.append(stop.coordinate.clLocationCoordinate2D)
+        }
+        
+        coordinates.append(trip.destination.coordinate.clLocationCoordinate2D)
+        
+        return coordinates
+    }
+}

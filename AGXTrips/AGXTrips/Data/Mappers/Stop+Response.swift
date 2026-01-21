@@ -10,6 +10,7 @@ import Foundation
 extension Stop {
     init?(from response: StopResponse) {
         let dateFormatter = ISO8601DateFormatter()
+        dateFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
         
         guard let stopTime = dateFormatter.date(from: response.stopTime) else { return nil }
         

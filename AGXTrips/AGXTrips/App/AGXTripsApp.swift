@@ -9,9 +9,16 @@ import SwiftUI
 
 @main
 struct AGXTripsApp: App {
+    private let factory = DependencyFactory()
+    
     var body: some Scene {
         WindowGroup {
-            EmptyView()
+            TripListView(
+                viewModel: TripListViewModel(
+                    tripRepository: factory.tripRepository,
+                    stopRepository: factory.stopRepository
+                )
+            )
         }
     }
 }
