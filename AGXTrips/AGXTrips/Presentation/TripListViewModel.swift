@@ -39,9 +39,6 @@ final class TripListViewModel {
             
             let (tripsData, stopsData) = try await (fetchedTrips, fetchedStops)
             
-            print(tripsData)
-            print(stopsData)
-            
             trips = tripsData
             stops = stopsData
         } catch {
