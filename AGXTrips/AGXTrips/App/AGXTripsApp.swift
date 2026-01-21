@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftData
 
 @main
 struct AGXTripsApp: App {
@@ -20,5 +21,6 @@ struct AGXTripsApp: App {
                 )
             )
         }
+        .modelContainer(for: Report.self)
     }
 }

@@ -11,31 +11,30 @@ import MapKit
 struct TripListView: View {
     @State var viewModel: TripListViewModel
     @State private var sheetDetent: PresentationDetent = .medium
-    @State private var showContactForm = false
+    @State private var showReportForm = false
     
     var body: some View {
         NavigationStack {
             ZStack {
                 mapView
                     .navigationTitle("AGXTrips")
-                    .navigationBarTitleDisplayMode(.inline)
                     .toolbar {
                         ToolbarItem(placement: .topBarTrailing) {
                             Button {
-                                showContactForm = true
+                                showReportForm = true
                             } label: {
                                 Image(systemName: "exclamationmark.bubble")
                             }
                         }
                     }
-                    .navigationDestination(isPresented: $showContactForm) {
-                        Text("Contact Form") // TODO: ContactFormView
+                    .navigationDestination(isPresented: $showReportForm) {
+                        ReportFormView()
                     }
             }
         }
-        .sheet(isPresented: .constant(true)) {
+        .sheet(isPresented: .constant(!showReportForm)) {
             sheetContent
-                .presentationDetents(sheetDetents, selection: $sheetDetent)
+                .presentationDetents(sheetDetentOptions, selection: $sheetDetent)
                 .presentationBackgroundInteraction(.enabled(upThrough: .medium))
                 .interactiveDismissDisabled()
         }
@@ -114,7 +113,7 @@ struct TripListView: View {
         }
     }
     
-    private var sheetDetents: Set<PresentationDetent> {
+    private var sheetDetentOptions: Set<PresentationDetent> {
         if viewModel.selectedStop != nil {
             return [.medium]
         } else {
