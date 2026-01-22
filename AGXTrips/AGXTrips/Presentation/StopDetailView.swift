@@ -27,25 +27,30 @@ struct StopDetailView: View {
                         .foregroundStyle(.secondary)
                 }
                 .padding()
+                .accessibilityElement(children: .combine)
+                .accessibilityLabel("Passenger: \(stop.userName), at \(stop.address)")
                 
                 HStack {
                     detailCard(
                         title: "Time",
                         value: stop.stopTime.formatted(date: .omitted, time: .shortened),
-                        icon: "clock.fill"
+                        icon: "clock.fill",
+                        accessibilityLabel: "Stop time: \(stop.stopTime.formatted(date: .omitted, time: .shortened))"
                     )
                     
                     detailCard(
                         title: "Price",
                         value: "\(stop.price.formatted())€",
-                        icon: "eurosign.circle.fill"
+                        icon: "eurosign.circle.fill",
+                        accessibilityLabel: "Price: \(stop.price.formatted()) euros"
                     )
                     
                     detailCard(
                         title: "Status",
                         value: stop.isPaid ? "Paid" : "Pending",
                         color: stop.isPaid ? .green : .red,
-                        icon: stop.isPaid ? "checkmark.square.fill" : "hourglass"
+                        icon: stop.isPaid ? "checkmark.square.fill" : "hourglass",
+                        accessibilityLabel: stop.isPaid ? "Paid" : "Pending payment"
                     )
                 }
                 .padding(.horizontal)
@@ -59,12 +64,13 @@ struct StopDetailView: View {
                     } label: {
                         Image(systemName: "xmark")
                     }
+                    .accessibilityLabel("Close")
                 }
             }
         }
     }
     
-    private func detailCard(title: String, value: String, color: Color = .gray, icon: String) -> some View {
+    private func detailCard(title: String, value: String, color: Color = .gray, icon: String, accessibilityLabel: String) -> some View {
         VStack(spacing: 8) {
             Image(systemName: icon)
                 .foregroundStyle(.secondary)
@@ -80,6 +86,8 @@ struct StopDetailView: View {
         .padding(.vertical, 16)
         .background(color.opacity(0.2))
         .clipShape(RoundedRectangle(cornerRadius: 12))
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(accessibilityLabel)
     }
 }
 

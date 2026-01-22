@@ -33,7 +33,7 @@ struct TripCardView: View {
                 
                 Spacer()
                 
-                Label("\(trip.startTime.formatted(date: .omitted, time: .shortened)) – \(trip.endTime.formatted(date: .omitted, time: .shortened))", systemImage: "clock")
+                Label(timeRange, systemImage: "clock")
             }
             .font(.headline)
             .foregroundStyle(.secondary)
@@ -41,7 +41,7 @@ struct TripCardView: View {
             Divider()
             
             HStack {
-                Label("\(trip.origin.address) → \(trip.destination.address)", systemImage: "point.topleft.down.to.point.bottomright.curvepath")
+                Label(routeDescription, systemImage: "point.topleft.down.to.point.bottomright.curvepath")
                 
                 Spacer()
                 
@@ -57,6 +57,29 @@ struct TripCardView: View {
             RoundedRectangle(cornerRadius: 16)
                 .stroke(isSelected ? Color.accentColor : Color(.separator).opacity(0.7), lineWidth: 2)
         )
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(accessibilityDescription)
+        .accessibilityHint(isSelected ? "Currently selected" : "Tap to select this trip and view on map")
+        .accessibilityAddTraits(isSelected ? [.isButton, .isSelected] : .isButton)
+    }
+    
+    private var timeRange: String {
+        "\(trip.startTime.formatted(date: .omitted, time: .shortened)) – \(trip.endTime.formatted(date: .omitted, time: .shortened))"
+    }
+    
+    private var routeDescription: String {
+        "\(trip.origin.address) → \(trip.destination.address)"
+    }
+    
+    private var accessibilityDescription: String {
+        """
+        Trip: \(trip.description). \
+        Status: \(trip.status.displayName). \
+        Driver: \(trip.driverName). \
+        Time: \(timeRange). \
+        Route from \(trip.origin.address) to \(trip.destination.address). \
+        \(trip.stops.count) stops.
+        """
     }
 }
 

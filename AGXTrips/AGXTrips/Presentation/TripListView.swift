@@ -19,6 +19,7 @@ struct TripListView: View {
             VStack {
                 mapView
                     .frame(height: 200)
+
                 tripList
             }
             .toolbar {
@@ -29,6 +30,8 @@ struct TripListView: View {
                         Image(systemName: "exclamationmark.bubble")
                     }
                     .badge(reports.count)
+                    .accessibilityLabel("Report an issue")
+                    .accessibilityHint("\(reports.count) reports submitted")
                 }
             }
             .navigationDestination(isPresented: $showReportForm) {
@@ -64,6 +67,9 @@ struct TripListView: View {
                     .tint(.red)
             }
         }
+        .accessibilityLabel("Trips map")
+        .accessibilityElement(children: .ignore)
+        .accessibilityHint(viewModel.selectedTrip != nil ? "Showing route for \(viewModel.selectedTrip!.description)" : "Select a trip to view its route")
         .onChange(of: viewModel.selectedStopTag) { _, newValue in
             viewModel.handleStopSelection(newValue)
         }
@@ -74,6 +80,7 @@ struct TripListView: View {
             LazyVStack(spacing: 12) {
                 Text("Available trips")
                     .font(.title.bold())
+                    .accessibilityAddTraits(.isHeader)
                 
                 ForEach(viewModel.trips) { trip in
                     TripCardView(
