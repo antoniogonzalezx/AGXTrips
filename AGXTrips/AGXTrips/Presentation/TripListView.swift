@@ -16,26 +16,37 @@ struct TripListView: View {
     
     var body: some View {
         NavigationStack {
-            VStack {
-                mapView
-                    .frame(height: 200)
-
-                tripList
-            }
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button {
-                        showReportForm = true
-                    } label: {
-                        Image(systemName: "exclamationmark.bubble")
-                    }
-                    .badge(reports.count)
-                    .accessibilityLabel("Report an issue")
-                    .accessibilityHint("\(reports.count) reports submitted")
+            if viewModel.isLoading {
+                loadingView
+            } else if let error = viewModel.error {
+                errorView(error.localizedDescription) {
+                    await viewModel.fetchTrips()
                 }
-            }
-            .navigationDestination(isPresented: $showReportForm) {
-                ReportFormView()
+            } else {
+                VStack {
+                    mapView
+                        .frame(height: 200)
+
+                    tripList
+                }
+                .toolbar {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Button {
+                            showReportForm = true
+                        } label: {
+                            Image(systemName: "exclamationmark.bubble")
+                        }
+                        .badge(reports.count)
+                        .accessibilityLabel("Report an issue")
+                        .accessibilityHint("\(reports.count) reports submitted")
+                    }
+                }
+                .navigationDestination(isPresented: $showReportForm) {
+                    ReportFormView()
+                }
+                .refreshable {
+                    await viewModel.fetchTrips()
+                }
             }
         }
         .sheet(item: $viewModel.selectedStop, content: { stop in
@@ -94,5 +105,43 @@ struct TripListView: View {
             }
             .padding()
         }
+    }
+    
+    private var loadingView: some View {
+        VStack {
+            Image("")
+                .frame(height: 200)
+            
+            ScrollView {
+                LazyVStack(spacing: 12) {
+                    Text("Available trips")
+                        .font(.title.bold())
+                    
+                    ForEach(0..<10) { _ in
+                        TripCardView(trip: .mock(status: .finalized), isSelected: false)
+                    }
+                }
+                .padding()
+            }
+        }
+        .redacted(reason: .placeholder)
+    }
+    
+    private func errorView(_ message: String, retryAction: @escaping () async -> Void) -> some View {
+        ContentUnavailableView(label: {
+            Label("Error", systemImage: "exclamationmark.triangle")
+        }, description: {
+            Text(message)
+        }, actions: {
+            Button {
+                Task {
+                    await retryAction()
+                }
+            } label: {
+                Text("Retry")
+                    .fontWeight(.bold)
+            }
+            .buttonStyle(.borderedProminent)
+        })
     }
 }

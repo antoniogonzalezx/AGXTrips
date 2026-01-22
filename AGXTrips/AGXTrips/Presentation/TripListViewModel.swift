@@ -16,7 +16,7 @@ final class TripListViewModel {
     
     private(set) var trips: [Trip] = []
     private(set) var stops: [Stop] = []
-    private(set) var isLoading: Bool = false
+    private(set) var isLoading: Bool = true
     private(set) var error: Error?
     
     var selectedTrip: Trip?
