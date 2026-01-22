@@ -81,8 +81,8 @@ struct TripTests {
             stops: [
                 .init(id: 0, coordinate: .init(latitude: 1.0, longitude: 2.0))
             ],
-            startTime: Date(),
-            endTime: Date().addingTimeInterval(3600)
+            startTime: Date(timeIntervalSince1970: 123456789),
+            endTime: Date(timeIntervalSince1970: 1234567890)
         )
     }
     
