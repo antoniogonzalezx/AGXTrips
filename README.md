@@ -1,10 +1,8 @@
 # AGXTrips
 
-A bus trip management app built as part of the SEAT:CODE iOS Technical Challenge.
-
 ## About
 
-This app displays a list of bus trips fetched from a [given API](https://sandbox-giravolta-static.s3.eu-west-1.amazonaws.com/tech-test/trips.json). Users can select any trip to visualize its route on a map, view stop details, and submit issue reports through a contact form. The project follows Clean Architecture principles and uses SwiftUI with the modern **@Observable** macro.
+This app displays a list of bus trips fetched from an [API](https://sandbox-giravolta-static.s3.eu-west-1.amazonaws.com/tech-test/trips.json). Users can select any trip to visualize its route on a map, view stop details, and submit issue reports through a contact form. The project follows Clean Architecture principles and uses SwiftUI with the modern **@Observable** macro.
 
 ## Screenshots
 
